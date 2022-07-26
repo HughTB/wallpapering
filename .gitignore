@@ -3,3 +3,5 @@ obj/
 .vs/
 *.env
 *.conf
+config.json
+*.jpg
