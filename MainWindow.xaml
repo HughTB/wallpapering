@@ -1,0 +1,15 @@
+﻿<Window x:Name="Main" x:Class="Wallpapering.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wallpapering"
+        mc:Ignorable="d"
+        Title="Wallpapering" Height="450" Width="800" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True" Loaded="Main_Loaded">
+    <Grid>
+        <MediaElement x:Name="meBackground" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Label x:Name="lblClock" Content="00:00:00" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="1" FontSize="48"/>
+        <Label x:Name="lblDate" Content="Monday, 1st January 2022" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,100,0,0" Panel.ZIndex="1" FontSize="18"/>
+
+    </Grid>
+</Window>
