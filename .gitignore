@@ -5,4 +5,4 @@ obj/
 *.conf
 config.json
 *.jpg
-[Pp]roperties/
+Properties/
