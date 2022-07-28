@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Wallpapering" Height="450" Width="800" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True" Loaded="Main_Loaded" Closed="Main_Closed" ShowInTaskbar="False" StateChanged="Main_StateChanged">
     <Grid>
-        <MediaElement x:Name="meBackground" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <MediaElement x:Name="meBackground" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsMuted="True" LoadedBehavior="Manual" Loaded="meBackground_Loaded" MediaEnded="meBackground_MediaEnded"/>
         <Label x:Name="lblClock" Content="00:00:00" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="1" FontSize="48"/>
         <Label x:Name="lblDate" Content="Monday, 1st January 2022" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,100,0,0" Panel.ZIndex="1" FontSize="18"/>
         <WrapPanel x:Name="wrpButtons" Panel.ZIndex="1" VerticalAlignment="Bottom" Margin="1,0,0,100" Height="100" HorizontalAlignment="Center"/>

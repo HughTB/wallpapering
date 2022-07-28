@@ -338,6 +338,18 @@ namespace Wallpapering
             mnuInvert.IsChecked = invertClock;
         }
 
+        private void meBackground_Loaded(object sender, RoutedEventArgs e)
+        {
+            meBackground.Play();
+        }
+
+        private void meBackground_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            meBackground.Stop();
+            meBackground.Position = new TimeSpan(0);
+            meBackground.Play();
+        }
+
         private void TwelveHour(object sender, EventArgs e)
         {
             twelveHr = !twelveHr;
