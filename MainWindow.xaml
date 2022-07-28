@@ -5,12 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wallpapering"
         mc:Ignorable="d"
-        Title="Wallpapering" Height="450" Width="800" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True" Loaded="Main_Loaded" Closed="Main_Closed">
+        Title="Wallpapering" Height="450" Width="800" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True" Loaded="Main_Loaded" Closed="Main_Closed" ShowInTaskbar="False">
     <Grid>
         <MediaElement x:Name="meBackground" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         <Label x:Name="lblClock" Content="00:00:00" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="1" FontSize="48"/>
         <Label x:Name="lblDate" Content="Monday, 1st January 2022" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,100,0,0" Panel.ZIndex="1" FontSize="18"/>
-        <WrapPanel x:Name="wrpButtons" Panel.ZIndex="1" VerticalAlignment="Bottom" Margin="100,0,100,100" Height="100"/>
+        <WrapPanel x:Name="wrpButtons" Panel.ZIndex="1" VerticalAlignment="Bottom" Margin="1,0,0,100" Height="100" HorizontalAlignment="Center"/>
 
     </Grid>
+
+    <Window.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="Change Background" Click="WallpaperPicker"/>
+            <Separator/>
+            <MenuItem x:Name="mnuInvert" Header="Invert Clock Colour" Click="InvertClock"/>
+            <MenuItem x:Name="mnuTwelve" Header="Twelve Hour Clock" Click="TwelveHour"/>
+            <Separator/>
+            <MenuItem Header="Add button">
+                <MenuItem Header="Application" Click="LocalButton"/>
+                <MenuItem Header="Website" Click="WebButton"/>
+                <MenuItem Header="Steam Game" Click="SteamButton"/>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="Exit" Click="Close"/>
+        </ContextMenu>
+    </Window.ContextMenu>
 </Window>

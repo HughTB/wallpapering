@@ -16,6 +16,7 @@ using System.Windows.Threading;
 using System.Globalization;
 using Newtonsoft.Json;
 using System.IO;
+using Microsoft.Win32;
 
 namespace Wallpapering
 {
@@ -65,6 +66,7 @@ namespace Wallpapering
                 invertClock = conf.invertClock;
                 background = conf.background;
                 buttonSize = conf.buttonSize;
+                wrpButtons.Height = conf.buttonSize;
                 buttons = conf.buttons;
 
                 meBackground.Source = new Uri($"{Directory.GetCurrentDirectory()}\\{System.IO.Path.GetFileName(background)}", UriKind.Absolute);
@@ -127,10 +129,76 @@ namespace Wallpapering
             }
         }
 
+        public void CreateButton(string uri, string icon)
+        {
+            Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}\\icons");
+            File.Copy(icon, $"{Directory.GetCurrentDirectory()}\\icons\\{System.IO.Path.GetFileName(icon)}", true);
+            icon = System.IO.Path.GetFileName(icon);
+
+            buttons.Add(new ConfigButton()
+            {
+                uri = uri,
+                icon = icon
+            });
+
+            UpdateButtons();
+        }
+
+        public void LocalButton(object sender, EventArgs e)
+        {
+            string uri = "";
+            string icon = "";
+
+            OpenFileDialog ofd = new OpenFileDialog()
+            {
+                InitialDirectory = "C:\\",
+                Filter = "All Files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                Title = "Wallpapering - Select an application or file"
+            };
+
+            if (ofd.ShowDialog() == true)
+            {
+                uri = ofd.FileName;
+            }
+
+            ofd = new OpenFileDialog()
+            {
+                InitialDirectory = "C:\\",
+                Filter = "Image files (*.png;*.jpg;*.jpeg;*.gif;*.ico)|*.png;*.jpg;*.jpeg;*.gif;*.ico",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                Title = "Wallpapering - Select an icon"
+            };
+
+            if (ofd.ShowDialog() == true)
+            {
+                icon = ofd.FileName;
+            }
+
+            CreateButton(uri, icon);
+            SaveConfig();
+        }
+
+        public void WebButton(object sender, EventArgs e)
+        {
+
+        }
+        
+        public void SteamButton(object sender, EventArgs e)
+        {
+
+        }
+
         private void UpdateWallpaper(string filename)
         {
-            File.Copy(filename, $"{Directory.GetCurrentDirectory()}\\{System.IO.Path.GetFileName(filename)}");
-            meBackground.Source = new Uri($"{Directory.GetCurrentDirectory()}\\{System.IO.Path.GetFileName(filename)}", UriKind.Absolute);
+            background = System.IO.Path.GetFileName(filename);
+
+            File.Copy(filename, $"{Directory.GetCurrentDirectory()}\\{background}", true);
+            meBackground.Source = new Uri($"{Directory.GetCurrentDirectory()}\\{background}", UriKind.Absolute);
+
+            SaveConfig();
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
@@ -154,6 +222,40 @@ namespace Wallpapering
         private void Main_Closed(object sender, EventArgs e)
         {
             SaveConfig();
+        }
+
+        private void Close(object sender, EventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void WallpaperPicker(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog()
+            {
+                InitialDirectory = "%USERPROFILE%\\Pictures",
+                Filter = "All Files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                Title = "Wallpapering - Select a new wallpaper"
+            };
+
+            if (ofd.ShowDialog() == true)
+            {
+                UpdateWallpaper(ofd.FileName);
+            }
+        }
+
+        private void InvertClock(object sender, EventArgs e)
+        {
+            invertClock = !invertClock;
+            mnuInvert.IsChecked = invertClock;
+        }
+
+        private void TwelveHour(object sender, EventArgs e)
+        {
+            twelveHr = !twelveHr;
+            mnuTwelve.IsChecked = twelveHr;
         }
     }
 
