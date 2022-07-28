@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wallpapering"
         mc:Ignorable="d"
-        Title="Wallpapering" Height="450" Width="800" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True" Loaded="Main_Loaded" Closed="Main_Closed" ShowInTaskbar="False">
+        Title="Wallpapering" Height="450" Width="800" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True" Loaded="Main_Loaded" Closed="Main_Closed" ShowInTaskbar="False" StateChanged="Main_StateChanged">
     <Grid>
         <MediaElement x:Name="meBackground" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         <Label x:Name="lblClock" Content="00:00:00" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="1" FontSize="48"/>
@@ -27,6 +27,7 @@
                 <MenuItem Header="Steam Game" Click="SteamButton"/>
             </MenuItem>
             <Separator/>
+            <MenuItem Header="Hide" Click="HideWindow"/>
             <MenuItem Header="Exit" Click="Close"/>
         </ContextMenu>
     </Window.ContextMenu>

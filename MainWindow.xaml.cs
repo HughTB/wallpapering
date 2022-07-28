@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Globalization;
 using Newtonsoft.Json;
 using System.IO;
 using Microsoft.Win32;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
+using Forms = System.Windows.Forms;
+using System.Reflection;
 
 namespace Wallpapering
 {
@@ -25,11 +21,19 @@ namespace Wallpapering
     /// </summary>
     public partial class MainWindow : Window
     {
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        [DllImport("user32.dll")]
+        static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        private const int GWL_EX_STYLE = -20;
+        private const int WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
+
         private bool invertClock = false;
         private bool twelveHr = false;
         private string background = "background.jpg";
         private int buttonSize = 100;
         private List<ConfigButton> buttons = new List<ConfigButton>();
+        private Forms.NotifyIcon notifyIcon = new Forms.NotifyIcon() { Visible = false, Text = "Wallpapering - Running in background..." };
 
         public MainWindow()
         {
@@ -203,7 +207,16 @@ namespace Wallpapering
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
+            var helper = new WindowInteropHelper(this).Handle;
+            SetWindowLong(helper, GWL_EX_STYLE, (GetWindowLong(helper, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
+
             LoadConfig();
+
+            notifyIcon.Click += delegate (object? sender, EventArgs e)
+            {
+                ShowWindow();
+            };
+            notifyIcon.Icon = new System.Drawing.Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("Wallpapering.icon.ico")); 
 
             ResizeWindow();
             UpdateClock();
@@ -222,11 +235,33 @@ namespace Wallpapering
         private void Main_Closed(object sender, EventArgs e)
         {
             SaveConfig();
+            notifyIcon.Dispose();
+        }
+
+        private void Main_StateChanged(object sender, EventArgs e)
+        {
+            if (this.WindowState == WindowState.Minimized)
+            {
+                notifyIcon.Visible = true;
+            } else if (this.WindowState == WindowState.Normal)
+            {
+                notifyIcon.Visible = false;
+            }
         }
 
         private void Close(object sender, EventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        private void HideWindow(object sender, EventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void ShowWindow()
+        {
+            this.WindowState = WindowState.Normal;
         }
 
         private void WallpaperPicker(object sender, EventArgs e)
