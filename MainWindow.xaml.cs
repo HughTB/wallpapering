@@ -31,7 +31,7 @@ namespace Wallpapering
         private bool invertClock = false;
         private bool twelveHr = false;
         private string background = "background.jpg";
-        private int buttonSize = 100;
+        private int buttonSize = 64;
         private List<ConfigButton> buttons = new List<ConfigButton>();
         private Forms.NotifyIcon notifyIcon = new Forms.NotifyIcon() { Visible = false, Text = "Wallpapering - Running in background..." };
 
@@ -187,12 +187,63 @@ namespace Wallpapering
 
         public void WebButton(object sender, EventArgs e)
         {
+            string url = "";
+            string icon = "";
 
+            TextDialog txt = new TextDialog("Wallpapering", "Enter a URL:", "https://google.com/");
+
+            if (txt.ShowDialog() == true)
+            {
+                OpenFileDialog ofd = new OpenFileDialog()
+                {
+                    InitialDirectory = "C:\\",
+                    Filter = "Image files (*.png;*.jpg;*.jpeg;*.gif;*.ico)|*.png;*.jpg;*.jpeg;*.gif;*.ico",
+                    FilterIndex = 1,
+                    RestoreDirectory = true,
+                    Title = "Wallpapering - Select an icon"
+                };
+
+                if (ofd.ShowDialog() == true)
+                {
+                    icon = ofd.FileName;
+                }
+
+                url = txt.Response;
+                url = (url.Contains("https://") || url.Contains("http://")) ? url : $"http://{url}";
+
+                CreateButton(url, icon);
+                SaveConfig();
+            }
         }
         
         public void SteamButton(object sender, EventArgs e)
         {
+            string url = "";
+            string icon = "";
 
+            TextDialog txt = new TextDialog("Wallpapering", "Enter a Steam AppID:", "730");
+
+            if (txt.ShowDialog() == true)
+            {
+                OpenFileDialog ofd = new OpenFileDialog()
+                {
+                    InitialDirectory = "C:\\",
+                    Filter = "Image files (*.png;*.jpg;*.jpeg;*.gif;*.ico)|*.png;*.jpg;*.jpeg;*.gif;*.ico",
+                    FilterIndex = 1,
+                    RestoreDirectory = true,
+                    Title = "Wallpapering - Select an icon"
+                };
+
+                if (ofd.ShowDialog() == true)
+                {
+                    icon = ofd.FileName;
+                }
+
+                url = $"steam://rungameid/{txt.Response}";
+
+                CreateButton(url, icon);
+                SaveConfig();
+            }
         }
 
         private void UpdateWallpaper(string filename)
