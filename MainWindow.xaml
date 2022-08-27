@@ -20,6 +20,7 @@
             <Separator/>
             <MenuItem x:Name="mnuInvert" Header="Invert Clock Colour" Click="InvertClock"/>
             <MenuItem x:Name="mnuTwelve" Header="Twelve Hour Clock" Click="TwelveHour"/>
+            <MenuItem x:Name="mnuShow" Header="Show Clock" Click="ShowClock"/>
             <Separator/>
             <MenuItem Header="Add button">
                 <MenuItem Header="Application" Click="LocalButton"/>
@@ -27,6 +28,8 @@
                 <MenuItem Header="Steam Game" Click="SteamButton"/>
             </MenuItem>
             <Separator/>
+            <MenuItem Header="Save Config" Click="SaveConfigFile"/>
+            <MenuItem Header="Reload Config" Click="ReloadConfigFile"/>
             <MenuItem Header="Hide" Click="HideWindow"/>
             <MenuItem Header="Exit" Click="Close"/>
         </ContextMenu>

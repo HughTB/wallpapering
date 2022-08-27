@@ -28,11 +28,16 @@ namespace Wallpapering
         private const int GWL_EX_STYLE = -20;
         private const int WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
 
-        private bool invertClock = false;
-        private bool twelveHr = false;
-        private string background = "background.jpg";
-        private int buttonSize = 64;
-        private List<ConfigButton> buttons = new List<ConfigButton>();
+        private Config config = new Config()
+        {
+            invertClock = false,
+            twelveHr = false,
+            showClock = true,
+            background = "background.jpg",
+            buttonSize = 64,
+            buttons = new List<ConfigButton>()
+        };
+
         private Forms.NotifyIcon notifyIcon = new Forms.NotifyIcon() { Visible = false, Text = "Wallpapering - Running in background..." };
 
         public MainWindow()
@@ -50,53 +55,77 @@ namespace Wallpapering
 
         private void UpdateClock()
         {
-            lblClock.Foreground = (invertClock) ? Brushes.Black : Brushes.White;
-            lblDate.Foreground = (invertClock) ? Brushes.Black : Brushes.White;
-            lblClock.Content = DateTime.Now.ToString((twelveHr) ? @"hh:mm:ss tt" : @"HH:mm:ss", CultureInfo.CurrentCulture);
-            lblDate.Content = DateTime.Now.ToString(@"dddd, d MMMM yyyy", CultureInfo.CurrentCulture);
+            if (config.showClock)
+            {
+                lblClock.Foreground = (config.invertClock) ? Brushes.Black : Brushes.White;
+                lblDate.Foreground = (config.invertClock) ? Brushes.Black : Brushes.White;
+                lblClock.Content = DateTime.Now.ToString((config.twelveHr) ? @"hh:mm:ss tt" : @"HH:mm:ss", CultureInfo.CurrentCulture);
+                lblDate.Content = DateTime.Now.ToString(@"dddd, d MMMM yyyy", CultureInfo.CurrentCulture);
+            }
+            else
+            {
+                lblClock.Content = "";
+                lblDate.Content = "";
+            }
         }
 
         private void LoadConfig()
         {
-            if (File.Exists("config.json")) {
-                Config conf;
-
-                using (StreamReader sr = new StreamReader("config.json"))
-                {
-                    conf = JsonConvert.DeserializeObject<Config>(sr.ReadToEnd());
-                }
-
-                twelveHr = conf.twelveHr;
-                invertClock = conf.invertClock;
-                background = conf.background;
-                buttonSize = conf.buttonSize;
-                wrpButtons.Height = conf.buttonSize;
-                buttons = conf.buttons;
-
-                meBackground.Source = new Uri($"{Directory.GetCurrentDirectory()}\\{System.IO.Path.GetFileName(background)}", UriKind.Absolute);
-                UpdateButtons();
-            } else
+            if (File.Exists("config.json"))
             {
-                SaveConfig();
-                UpdateButtons();
-                meBackground.Source = new Uri($"{Directory.GetCurrentDirectory()}\\{System.IO.Path.GetFileName(background)}", UriKind.Absolute);
+                try
+                {
+                    using (StreamReader sr = new StreamReader("config.json"))
+                    {
+                        config = JsonConvert.DeserializeObject<Config>(sr.ReadToEnd());
+                    }
+                } catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                    
+                    config = new Config()
+                    {
+                        invertClock = false,
+                        twelveHr = false,
+                        showClock = true,
+                        background = "background.jpg",
+                        buttonSize = 64,
+                        buttons = new List<ConfigButton>()
+                    };
+
+                    SaveConfig();
+                }
             }
+            else
+            {
+                config = new Config()
+                {
+                    invertClock = false,
+                    twelveHr = false,
+                    showClock = true,
+                    background = "background.jpg",
+                    buttonSize = 64,
+                    buttons = new List<ConfigButton>()
+                };
+
+                SaveConfig();
+            }
+
+            UpdateButtons();
+            meBackground.Source = new Uri($"{Directory.GetCurrentDirectory()}\\{System.IO.Path.GetFileName(config.background)}", UriKind.Absolute);
         }
 
         private void SaveConfig()
         {
-            Config conf = new Config()
+            try
             {
-                twelveHr = this.twelveHr,
-                invertClock = this.invertClock,
-                background = this.background,
-                buttonSize = this.buttonSize,
-                buttons = this.buttons
-            };
-
-            using (StreamWriter sw = new StreamWriter("config.json"))
+                using (StreamWriter sw = new StreamWriter("config.json"))
+                {
+                    sw.WriteLine(JsonConvert.SerializeObject(config, Formatting.Indented));
+                }
+            } catch (Exception e)
             {
-                sw.WriteLine(JsonConvert.SerializeObject(conf, Formatting.Indented));
+                MessageBox.Show(e.Message);
             }
         }
 
@@ -104,7 +133,7 @@ namespace Wallpapering
         {
             wrpButtons.Children.Clear();
 
-            foreach (ConfigButton configButton in buttons)
+            foreach (ConfigButton configButton in config.buttons)
             {
                 Button button = new Button();
                 button.Content = "";
@@ -116,8 +145,8 @@ namespace Wallpapering
                         FileName = "explorer.exe"
                     });
                 };
-                button.Width = buttonSize;
-                button.Height = buttonSize;
+                button.Width = config.buttonSize;
+                button.Height = config.buttonSize;
                 button.Margin = new Thickness(10, 0, 10, 0);
                 button.BorderThickness = new Thickness(0);
                 button.Background = Brushes.Transparent;
@@ -139,7 +168,7 @@ namespace Wallpapering
             File.Copy(icon, $"{Directory.GetCurrentDirectory()}\\icons\\{System.IO.Path.GetFileName(icon)}", true);
             icon = System.IO.Path.GetFileName(icon);
 
-            buttons.Add(new ConfigButton()
+            config.buttons.Add(new ConfigButton()
             {
                 uri = uri,
                 icon = icon
@@ -248,10 +277,10 @@ namespace Wallpapering
 
         private void UpdateWallpaper(string filename)
         {
-            background = System.IO.Path.GetFileName(filename);
+            config.background = System.IO.Path.GetFileName(filename);
 
-            File.Copy(filename, $"{Directory.GetCurrentDirectory()}\\{background}", true);
-            meBackground.Source = new Uri($"{Directory.GetCurrentDirectory()}\\{background}", UriKind.Absolute);
+            File.Copy(filename, $"{Directory.GetCurrentDirectory()}\\{config.background}", true);
+            meBackground.Source = new Uri($"{Directory.GetCurrentDirectory()}\\{config.background}", UriKind.Absolute);
 
             SaveConfig();
         }
@@ -281,11 +310,14 @@ namespace Wallpapering
             };
             clockTimer.Interval = new TimeSpan(0, 0, 0, 0, 1000);
             clockTimer.Start();
+
+            mnuInvert.IsChecked = config.invertClock;
+            mnuTwelve.IsChecked = config.twelveHr;
+            mnuShow.IsChecked = config.showClock;
         }
 
         private void Main_Closed(object sender, EventArgs e)
         {
-            SaveConfig();
             notifyIcon.Dispose();
         }
 
@@ -334,8 +366,8 @@ namespace Wallpapering
 
         private void InvertClock(object sender, EventArgs e)
         {
-            invertClock = !invertClock;
-            mnuInvert.IsChecked = invertClock;
+            config.invertClock = !config.invertClock;
+            mnuInvert.IsChecked = config.invertClock;
         }
 
         private void meBackground_Loaded(object sender, RoutedEventArgs e)
@@ -352,8 +384,24 @@ namespace Wallpapering
 
         private void TwelveHour(object sender, EventArgs e)
         {
-            twelveHr = !twelveHr;
-            mnuTwelve.IsChecked = twelveHr;
+            config.twelveHr = !config.twelveHr;
+            mnuTwelve.IsChecked = config.twelveHr;
+        }
+
+        private void ReloadConfigFile(object sender, EventArgs e)
+        {
+            LoadConfig();
+        }
+
+        private void SaveConfigFile(object sender, EventArgs e)
+        {
+            SaveConfig();
+        }
+
+        private void ShowClock(object sender, EventArgs e)
+        {
+            config.showClock = !config.showClock;
+            mnuShow.IsChecked = config.showClock;
         }
     }
 
@@ -361,6 +409,7 @@ namespace Wallpapering
     {
         public bool invertClock;
         public bool twelveHr;
+        public bool showClock;
         public string background;
         public int buttonSize;
         public List<ConfigButton> buttons;
